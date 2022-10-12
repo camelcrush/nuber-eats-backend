@@ -57,7 +57,7 @@ export class UsersService {
       if (!user) {
         return { ok: false, error: 'User not found' };
       }
-      const passwordOk = user.checkPassword(password);
+      const passwordOk = await user.checkPassword(password);
       if (!passwordOk) {
         return {
           ok: false,
@@ -70,8 +70,7 @@ export class UsersService {
         token,
       };
     } catch (error) {
-      console.log(error);
-      return { ok: false, error };
+      return { ok: false, error: "Can't log user in" };
     }
   }
 
