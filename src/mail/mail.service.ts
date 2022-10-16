@@ -10,11 +10,7 @@ export class MailService {
     @Inject(CONFIG_OPTIONS) private readonly options: MailModuleOptions,
   ) {}
 
-  private async sendEmail(
-    subject: string,
-    template: string,
-    emailVars: EmailVar[],
-  ) {
+  async sendEmail(subject: string, template: string, emailVars: EmailVar[]) {
     const form = new FormData();
     form.append('from', `Nuber <Nuber@mailgun-test.com>`);
     form.append('to', `dkxm09277@gmail.com`); // production일 때는 수신사 조정
