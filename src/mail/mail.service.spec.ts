@@ -61,6 +61,7 @@ describe('MailServcie', () => {
     it('sends email', async () => {
       const result = await service.sendEmail('', '', []);
       const formSpy = jest.spyOn(FormData.prototype, 'append');
+      // FormData.prototype.append로 대체 가능
       expect(formSpy).toHaveBeenCalled();
       expect(got.post).toHaveBeenCalledTimes(1);
       expect(got.post).toHaveBeenCalledWith(
