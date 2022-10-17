@@ -44,7 +44,9 @@ import { MailModule } from './mail/mail.module';
       database: process.env.DB_DATABASE,
       synchronize: process.env.NODE_ENV !== 'prod',
       logging:
-        process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
+        process.env.NODE_ENV !== 'prod' &&
+        process.env.NODE_ENV !== 'test' &&
+        process.env.NODE_ENV !== 'dev',
       entities: [User, Verification],
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
