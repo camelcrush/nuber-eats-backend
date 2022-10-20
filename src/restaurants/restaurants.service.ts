@@ -10,6 +10,7 @@ import {
   EditRestaurantInput,
   EditRestaurantOutput,
 } from './dtos/edit-restaurant.dto';
+import { Category } from './entities/category.entity';
 import { Restaurant } from './entities/restaurant.entity';
 import { CategoryRepository } from './repositories/category.repository';
 
@@ -66,6 +67,19 @@ export class RestaurantService {
         };
       }
       //////
+      let category: Category = null;
+      if (editRestaurantInput.categoryName) {
+        category = await this.categories.getOrCreate(
+          editRestaurantInput.categoryName,
+        );
+      }
+      await this.restaurants.save([
+        {
+          id: editRestaurantInput.retaurantId,
+          ...editRestaurantInput,
+          ...(category && { category }),
+        },
+      ]);
       return {
         ok: true,
       };
