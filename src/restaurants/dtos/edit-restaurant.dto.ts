@@ -5,7 +5,7 @@ import { CreateRestaurantInput } from './create-restaurant.dto';
 @InputType()
 export class EditRestaurantInput extends PartialType(CreateRestaurantInput) {
   @Field((type) => Number)
-  retaurantId: number;
+  restaurantId: number;
 }
 
 @ObjectType()
