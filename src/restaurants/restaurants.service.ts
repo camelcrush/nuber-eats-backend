@@ -171,6 +171,7 @@ export class RestaurantService {
       const totalResults = await this.countRestaurants(category);
       return {
         ok: true,
+        restaurants,
         category,
         totalPages: Math.ceil(totalResults / 5),
       };
