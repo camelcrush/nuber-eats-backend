@@ -9,3 +9,9 @@ Owner
 
 Client
 "x-jwt":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiaWF0IjoxNjY3MzA0NjkwfQ.ItWlWdiKpTTeXiAnPp-6kxKvnMvtDblgTEfriEg33Vg"
+
+Order Subscription:
+
+    - Pending Orders (Owner) (T: createOrder)
+    - Order Status (Customer, Delivery, Owner) (T:editOrder)
+    - Pending Pickup Order (Delivery)
