@@ -19,6 +19,7 @@ import {
   EditRestaurantInput,
   EditRestaurantOutput,
 } from './dtos/edit-restaurant.dto';
+import { MyRestaurantsOutput } from './dtos/my-restaurants.dto';
 import { RestaurantInput, RestaurantOutput } from './dtos/restaurant.dto';
 import { RestaurantsInput, RestaurantsOutput } from './dtos/restaurants.dto';
 import {
@@ -176,8 +177,8 @@ export class RestaurantService {
       }
       const restaurants = await this.restaurants.find({
         where: { category },
-        take: 5,
-        skip: (page - 1) * 5,
+        take: 9,
+        skip: (page - 1) * 9,
         order: {
           isPromoted: 'DESC',
         },
@@ -188,7 +189,8 @@ export class RestaurantService {
         ok: true,
         restaurants,
         category,
-        totalPages: Math.ceil(totalResults / 5),
+        totalPages: Math.ceil(totalResults / 9),
+        totalResults,
       };
     } catch {
       return {
@@ -201,8 +203,8 @@ export class RestaurantService {
   async allRestaurants({ page }: RestaurantsInput): Promise<RestaurantsOutput> {
     try {
       const [restaurnats, totalResults] = await this.restaurants.findAndCount({
-        take: 5,
-        skip: (page - 1) * 5,
+        take: 9,
+        skip: (page - 1) * 9,
         order: {
           isPromoted: 'DESC',
         },
@@ -210,7 +212,7 @@ export class RestaurantService {
       return {
         ok: true,
         results: restaurnats,
-        totalPages: Math.ceil(totalResults / 5),
+        totalPages: Math.ceil(totalResults / 9),
         totalResults,
       };
     } catch {
@@ -256,14 +258,14 @@ export class RestaurantService {
         where: {
           name: Raw((name) => `${name} ILIKE '%${query}%'`),
         },
-        take: 5,
-        skip: (page - 1) * 5,
+        take: 9,
+        skip: (page - 1) * 9,
       });
       return {
         ok: true,
         restaurants,
         totalResults,
-        totalPages: Math.ceil(totalResults / 5),
+        totalPages: Math.ceil(totalResults / 9),
       };
     } catch {
       return {
@@ -369,6 +371,21 @@ export class RestaurantService {
       return {
         ok: false,
         error: 'Could not delete dish',
+      };
+    }
+  }
+
+  async myRestaurants(owner: User): Promise<MyRestaurantsOutput> {
+    try {
+      const restaurants = await this.restaurants.find({ owner });
+      return {
+        ok: true,
+        restaurants,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: 'Could not find restaurnats',
       };
     }
   }
