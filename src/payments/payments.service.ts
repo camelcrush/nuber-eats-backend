@@ -3,7 +3,7 @@ import { Cron, Interval, SchedulerRegistry, Timeout } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 import { User } from 'src/users/entities/user.entity';
-import { LessThan, Repository } from 'typeorm';
+import { Equal, LessThan, Repository } from 'typeorm';
 import {
   CreatePaymentInput,
   CreatePaymentOutput,
@@ -26,7 +26,7 @@ export class PaymentService {
     { transactionId, restaurantId }: CreatePaymentInput,
   ): Promise<CreatePaymentOutput> {
     try {
-      const restaurant = await this.restaurants.findOne(restaurantId);
+      const restaurant = await this.restaurants.findOneBy({ id: restaurantId });
       if (!restaurant) {
         return {
           ok: false,
@@ -64,7 +64,9 @@ export class PaymentService {
 
   async getPayments(user: User): Promise<GetPaymentsOutput> {
     try {
-      const payments = await this.payments.find({ where: { user } });
+      const payments = await this.payments.find({
+        where: { user: Equal(user) },
+      });
       return {
         ok: true,
         payments,
@@ -79,7 +81,7 @@ export class PaymentService {
 
   @Cron('0 0 0 * * *')
   async checkPromotedRestaurant() {
-    const restaurants = await this.restaurants.find({
+    const restaurants = await this.restaurants.findBy({
       isPromoted: true,
       promotedUntil: LessThan(new Date()),
     });

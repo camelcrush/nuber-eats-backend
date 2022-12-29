@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
-import { Like, Raw, Repository } from 'typeorm';
+import { Equal, Like, Raw, Repository } from 'typeorm';
 import { AllCategoriesOutput } from './dtos/all-categories.dto';
 import { CategoryInput, CategoryOutput } from './dtos/category.dto';
 import { CreateDishInput, CreateDishOutput } from './dtos/create-dish.dto';
@@ -163,7 +163,7 @@ export class RestaurantService {
   }
 
   countRestaurants(category: Category) {
-    return this.restaurants.count({ category });
+    return this.restaurants.countBy({ category: Equal(category) });
   }
 
   async findCategoryBySlug({
@@ -181,7 +181,7 @@ export class RestaurantService {
         };
       }
       const restaurants = await this.restaurants.find({
-        where: { category },
+        where: { category: Equal(category) },
         take: 9,
         skip: (page - 1) * 9,
         order: {
@@ -382,7 +382,9 @@ export class RestaurantService {
 
   async myRestaurants(owner: User): Promise<MyRestaurantsOutput> {
     try {
-      const restaurants = await this.restaurants.find({ owner });
+      const restaurants = await this.restaurants.findBy({
+        owner: Equal(owner),
+      });
       return {
         ok: true,
         restaurants,
@@ -401,7 +403,7 @@ export class RestaurantService {
   ): Promise<MyRestaurantOutput> {
     try {
       const restaurant = await this.restaurants.findOne({
-        where: { id, owner },
+        where: { id, owner: Equal(owner) },
         relations: ['menu', 'orders'],
       });
       return {

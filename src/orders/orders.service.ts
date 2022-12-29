@@ -10,7 +10,7 @@ import {
 import { Dish } from 'src/restaurants/entities/dish.entity';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 import { User, UserRole } from 'src/users/entities/user.entity';
-import { Repository } from 'typeorm';
+import { Equal, Repository } from 'typeorm';
 import { CreateOrderInput, CreateOrderOutput } from './dtos/create-order.dto';
 import { EditOrderInput, EditOrderOutput } from './dtos/edit-order.dto';
 import { GetOrderInput, GetOrderOutput } from './dtos/get-order.dto';
@@ -119,15 +119,15 @@ export class OrderService {
       let orders: Order[];
       if (user.role === UserRole.Client) {
         orders = await this.orders.find({
-          where: { customer: user, ...(status && { status }) },
+          where: { customer: Equal(user), ...(status && { status }) },
         });
       } else if (user.role === UserRole.Delivery) {
         orders = await this.orders.find({
-          where: { driver: user, ...(status && { status }) },
+          where: { driver: Equal(user), ...(status && { status }) },
         });
       } else if (user.role === UserRole.Owner) {
         const restaurants = await this.restaurants.find({
-          where: { owner: user },
+          where: { owner: Equal(user) },
           relations: ['orders'],
         });
         orders = restaurants.map((restaurant) => restaurant.orders).flat(1);
