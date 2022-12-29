@@ -66,7 +66,7 @@ export class OrderService {
             if (dishOption.extra) {
               dishFinalPrice = dishFinalPrice + dishOption.extra;
             } else {
-              const dishOptionChoice = dishOption.choices.find(
+              const dishOptionChoice = dishOption.choices?.find(
                 (dishOptionChoice) =>
                   dishOptionChoice.name === itemOption.choice,
               );
@@ -95,11 +95,13 @@ export class OrderService {
           items: orderItems,
         }),
       );
+      // NEW_PENDING_ORDER publish 발행
       await this.pubSub.publish(NEW_PENDING_ORDER, {
         pendingOrders: { order, ownerId: restaurant.ownerId },
       });
       return {
         ok: true,
+        orderId: order.id,
       };
     } catch {
       return {
@@ -235,8 +237,8 @@ export class OrderService {
           error: 'Not authorized',
         };
       }
-      const newOrder = { ...order, status };
       await this.orders.save({ id: orderId, status });
+      const newOrder = { ...order, status };
       if (user.role === UserRole.Owner) {
         if (status === OrderStatus.Cooked) {
           await this.pubSub.publish(NEW_COOKED_ORDER, {
