@@ -61,9 +61,10 @@ import { UploadsModule } from './uploads/uploads.module';
             password: process.env.DB_PASSWORD,
             database: process.env.DB_DATABASE,
           }),
-      synchronize: process.env.NODE_ENV !== 'prod',
+      synchronize: process.env.NODE_ENV !== 'production',
       logging:
-        process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
+        process.env.NODE_ENV !== 'production' &&
+        process.env.NODE_ENV !== 'test',
       entities: [
         User,
         Verification,
