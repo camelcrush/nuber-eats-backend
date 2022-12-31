@@ -13,12 +13,15 @@ import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
 
+// Enum은 Typescript가 자체적으로 구현한 코드
+// 열거형으로 이름이 있는 상수들의 집합을 정의할 수 있습니다
 export enum UserRole {
   Client = 'Client',
   Owner = 'Owner',
   Delivery = 'Delivery',
 }
 
+// Graphql에서 사용하려면 registerEnumTpye을 통해 등록해줘야 함
 registerEnumType(UserRole, { name: 'UserRole' });
 
 @InputType('UserInputType', { isAbstract: true })

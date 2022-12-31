@@ -77,6 +77,7 @@ import { UploadsModule } from './uploads/uploads.module';
       ],
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
+      // subscription 설정 및 connection에 토큰 전달
       subscriptions: {
         'subscriptions-transport-ws': {
           onConnect: (connectionParams) => {
@@ -88,6 +89,7 @@ import { UploadsModule } from './uploads/uploads.module';
       playground: process.env.NODE_ENV !== 'production',
       driver: ApolloDriver,
       autoSchemaFile: true,
+      // http request 설정 및 context에 토큰 전달
       context: ({ req, connection }) => ({ token: req.headers['x-jwt'] }),
     }),
     ScheduleModule.forRoot(),
@@ -111,3 +113,14 @@ import { UploadsModule } from './uploads/uploads.module';
   providers: [],
 })
 export class AppModule {}
+
+// AppModule에 MiddlewareConsumer 설정
+
+// export class AppModule implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer.apply(JwtMiddleware).forRoutes({
+//       path: '/graphql',
+//       method: RequestMethod.POST,
+//     });
+//   }
+// }
