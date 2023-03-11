@@ -49,6 +49,21 @@ export class OrderService {
       }
       let orderFinalPrice = 0;
       const orderItems: OrderItem[] = [];
+      // [ for...of ]
+      // for...of 명령문은 반복가능한 객체 (Array, Map, Set, String, TypedArray, arguments 객체 등을 포함)에 대해서 반복하고
+      // 각 개별 속성값에 대해 실행되는 문이 있는 사용자 정의 반복 후크를 호출하는 루프를 생성합니다.
+      // ```
+      // const array1 = ['a', 'b', 'c'];
+
+      // for (const element of array1) {
+      // console.log(element);
+      // }
+
+      // // expected output: "a"
+      // // expected output: "b"
+      // // expected output: "c"
+      // ```
+      // https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Statements/for...of
       for (const item of items) {
         const dish = await this.dishes.findOne({ where: { id: item.dishId } });
         if (!dish) {
@@ -130,6 +145,31 @@ export class OrderService {
           where: { owner: Equal(user) },
           relations: ['orders'],
         });
+        // [ Array.prototype.flat() ]
+        // ex) const newArr = arr.flat([depth])
+        // flat() 메서드는 모든 하위 배열 요소를 지정한 깊이까지 재귀적으로 이어붙인 새로운 배열을 생성합니다.
+        // dept는 중첩 배열 구조를 평탄화할 때 사용할 깊이 값. 기본값은 1입니다.
+
+        // // 중첩 배열 평탄화
+        // ```
+        // [ [1], [2], [], [], [5], [6] ].flat()
+        // // [1, 2, 5, 6]
+
+        // const arr1 = [1, 2, [3, 4]];
+        // arr1.flat();
+        // // [1, 2, 3, 4]
+
+        // const arr4 = [1, 2, [3, 4, [5, 6, [7, 8, [9, 10]]]]];
+        // arr4.flat(Infinity);
+        // // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        // ```
+        // // 배열 구멍 제거
+        // ```
+        // const arr5 = [1, 2, , 4, 5];
+        // arr5.flat();
+        // // [1, 2, 4, 5]
+        // ```
+        // https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Array/flat
         orders = restaurants.map((restaurant) => restaurant.orders).flat(1);
         if (status) {
           orders = orders.filter((order) => order.status === status);
@@ -237,8 +277,11 @@ export class OrderService {
           error: 'Not authorized',
         };
       }
-      await this.orders.save({ id: orderId, status });
+      await this.orders.save([{ id: orderId, status }]);
+      // const newOrder = await this.orders.save([{ id: orderId, status }]);
+      // 업데이트 save()인 경우 order entity 전체를 반환하지 않음 : orderId와 status만 반환
       const newOrder = { ...order, status };
+      // owner가 Status를 Cooked로 바꿀 때 Publish
       if (user.role === UserRole.Owner) {
         if (status === OrderStatus.Cooked) {
           await this.pubSub.publish(NEW_COOKED_ORDER, {

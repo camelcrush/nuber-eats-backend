@@ -110,6 +110,31 @@ export class CategoryResolver {
     return this.restaurantService.countRestaurants(category);
   }
 
+  // [ @ResolveField() ]
+  // 매 request마다 계산된 field값을 가져온다.
+  // (DB에는 존재하지 않고 GraphQL 스키마에만 존재)
+  // ```
+  // @ResolveField('posts', returns => [Post])
+  // async getPosts(@Parent() author: Author) {
+  // const { id } = author;
+  // return this.postsService.findAll({ authorId: id });
+  // }
+  // ```
+  // https://docs.nestjs.com/graphql/resolvers
+
+  // Int 오류시 => Number
+  // @ResolveField((returns) => Number)
+
+  // [ GraphQL argument decorators ]
+  // 전용 데코레이터를 사용하여 표준 GraphQL resolver arguments에 접근할 수 있습니다.
+  // 다음은 Nest 데코레이터와 이들이 나타내는 일반 Apollo 매개변수를 비교한 것입니다.
+  // ```
+  // @Root() / @Parent() => root/parent : Field의 Parent는 class
+  // @Context(param?: string) => context / context[param]
+  // @Info(param?: string) => info / info[param]
+  // @Args(param?: string) => args / args[param]
+  // ```
+  // https://docs.nestjs.com/graphql/resolvers#graphql-argument-decorators
   @Query((returns) => AllCategoriesOutput)
   allCategories(): Promise<AllCategoriesOutput> {
     return this.restaurantService.allCategories();

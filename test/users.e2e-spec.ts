@@ -2,10 +2,50 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { getConnection, Repository } from 'typeorm';
+import { DataSource, getConnection, Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Verification } from 'src/users/entities/verification.entity';
+// jest-e2e.json에서 moduleNameMapper 설정
+// moduleNameMapper [object< string, string | array< string>>]
+// ```
+// {
+// "moduleNameMapper": {
+// "^image![a-zA-Z0-9$_-]+$": "GlobalImageStub",
+// "^[./a-zA-Z0-9$_-]+\\.png$": "/RelativeImageStub.js",
+// "module_name_(.*)": "/substituted_module_$1.js",
+// "assets/(.*)": [
+// "/images/$1",
+// "/photos/$1",
+// "/recipes/$1"
+// ]
+// }
+// }
+// ```
+// https://jestjs.io/docs/configuration#modulenamemapper-objectstring-string--arraystring
+
+// End-to-end testing
+
+// Jest did not exit one second after the test run has completed.와 같은 에러가 뜬다면
+//  app.close()를 통해 테스트가 끝나고 난 후, app을 종료시켜주기
+// ```
+// afterAll(async () => {
+// await app.close();
+// });
+// ```
+// https://docs.nestjs.com/fundamentals/testing#end-to-end-testing
+
+// getConnection()
+// connection 관리자에서 connection을 가져옵니다. connection 이름이 지정되지 않은 경우 "default" connection이 검색됩니다.
+// https://orkhan.gitbook.io/typeorm/docs/connection-api#connection-api
+
+// Connection이란?
+// Connection은 특정 데이터베이스에 대한 단일 데이터베이스 ORM 연결
+
+// dropDatabase()
+// 데이터베이스와 모든 데이터를 삭제합니다. 이 방법을 사용하면 모든 데이터베이스 테이블과 해당 데이터가 지워지므로
+// 프로덕션 환경에서는 이 방법에 주의하십시오. 데이터베이스 연결이 완료된 후에만 사용할 수 있습니다.
+// ex) await connection.dropDatabase();
 
 jest.mock('got', () => {
   return {
@@ -46,18 +86,19 @@ describe('UserModule (e2e)', () => {
   });
 
   afterAll(async () => {
-    // const dataSource = new DataSource({
-    //   type: 'postgres',
-    //   host: 'localhost',
-    //   port: 5432,
-    //   username: 'js',
-    //   password: process.env.DB_PASSWORD,
-    //   database: 'nuber-eats-test',
-    // });
-    // await dataSource.initialize();
-    // await dataSource.driver.connect();
-    // await dataSource.dropDatabase();
-    await getConnection().dropDatabase();
+    const dataSource = new DataSource({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'js',
+      password: process.env.DB_PASSWORD,
+      database: 'nuber-eats-test',
+    });
+    const connection = await dataSource.initialize();
+    await connection.dropDatabase();
+    await connection.destroy();
+    // getConnection()이 depercated됨에 따라 위 방식으로 변경
+    // await getConnection().dropDatabase();
     await app.close();
   });
 

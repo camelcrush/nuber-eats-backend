@@ -14,6 +14,15 @@ import { VerifyEmailInput, VerifyEmailOutput } from './dtos/verify-email.dto';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 
+// [ Args decorator ]
+// @Args() 데코레이터를 사용하여 메서드 핸들러에서 사용할 요청에서 인수를 추출합니다.
+// 이것은 REST 경로 매개변수 인수 추출과 매우 유사한 방식으로 작동합니다.
+// ```
+// @Args('id') id: string
+// @Args('name') name: string
+// ```
+// https://docs.nestjs.com/graphql/resolvers#args-decorator-options
+
 @Resolver()
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}

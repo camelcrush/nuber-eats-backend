@@ -61,15 +61,40 @@ export class OrderResolver {
   ): Promise<EditOrderOutput> {
     return this.orderService.editOrder(user, editOrderInput);
   }
+  // [ Filtering subscriptions ]
+  // Subscriptions을 사용할 때 특정 이벤트를 필터링하려면 필터 속성을 필터 함수로 설정할 수 있습니다.
+  // filter는 publish된 이벤트를 구분해주는 옵션으로 ( payload, variables, context Args )를 가짐, Boolean값을 꼭 리턴해줘야 함
+  // payload: pubsub.publish()를 통해 전달한 객체
+  // variables: subscription에 전달한 객체(인자)
+  // context: gqlContext객체
+  // ----------------------------------------------
+  // @Subscription(returns => Comment, {
+  // filter: (payload, variables, context) =>
+  // payload.commentAdded.title === variables.title,
+  // })
+  // commentAdded(@Args('title') title: string) {
+  // return pubSub.asyncIterator('commentAdded');
+  // }
+  // ----------------------------------------------
+  // https://docs.nestjs.com/graphql/subscriptions#filtering-subscriptions
+
+  // [ resolve ]
+  // 리턴하는 값은 pubsub.asyncIterator()를 통해 받는 값.
+  // publish한 event payload를 변형하려면 resolve 속성을 함수로 설정합니다. 함수는 이벤트 payload를 수신하고 적절한 값을 반환합니다.
+  // ----------------------------------------------
+  // @Subscription(returns => Comment, {
+  // resolve: value => value,
+  // })
+  // commentAdded() {
+  // return pubSub.asyncIterator('commentAdded');
+  // }
+  // ----------------------------------------------
+  // https://docs.nestjs.com/graphql/subscriptions#mutating-subscription-payloads
+
   // pendigOrders Subcription 생성하고 createOrder에서 pendingOrders Publish하면 감지
   // Client가 주문을 생성하면 Owner가 알림을 받기 위함
-  // filter는 publish된 이벤트를 구분해주는 옵션으로 payload, variables, context Args를 가짐, Boolean값을 꼭 리턴해줘야 함
-  // payload: pubsub.publish를 통해 전달한 객체, variables: subscription에서 전달한 객체, context: gqlContext
-  // resolve: 리턴하는 값은 pubsub.asyncIterator()를 통해 받는 값.
-  // publish한 event payload를 변형하려면 resolve 속성을 함수로 설정합니다. 함수는 이벤트 payload를 수신하고 적절한 값을 반환합니다.
   @Subscription((returns) => Order, {
     filter: ({ pendingOrders: { ownerId } }, _, { user }) => {
-      console.log(ownerId, user.id);
       return ownerId === user.id;
     },
     resolve: ({ pendingOrders: { order } }) => order,
